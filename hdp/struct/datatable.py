@@ -1,4 +1,5 @@
 import pandas as pd
+from hdp.struct.metadata import Metadata
 from enum import Enum
 
 
@@ -18,8 +19,8 @@ class Frequency(Enum):
 
 class DataTable:
     dt = pd.DataFrame()
+    meta = Metadata()
     relations = []
-    units = {}
     frequency = Frequency.custom
     category = None
     row_full = True
