@@ -1,7 +1,7 @@
 from hdp.process.load import *
 
 supported_formats = {'csv': load_csv,
-                     'txt': load_txt,
+                     'json': load_json,
                      'xlsx': load_xlsx,
                      'xls': load_xls,
                      'gpx': load_gpx,
@@ -9,5 +9,6 @@ supported_formats = {'csv': load_csv,
                      'jpg': load_jpg}
 
 
+# Team 1
 def load_files(files_paths: list):
     pass

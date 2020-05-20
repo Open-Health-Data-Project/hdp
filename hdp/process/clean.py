@@ -1,15 +1,26 @@
+default_units = {'speed': 'km/h',
+                 'distance': 'km',
+                 'weight': 'kg',
+                 'height': 'cm'}
+
+units_conversions = {}
+
+
+# Team 2
 def convert_time(time: str, format, mode: str):
     pass
 
 
+# Team 2
 def convert_date(date: str, format, mode: str):
     pass
 
 
-def clean_gpx(gpx_points):
+# Team 2
+def convert_units(datatables: list):
     pass
 
 
-def clean_data(dt, meta):
+# Team 2
+def clean_data(datatables: list, meta: list, columns: dict, date_time: list):
     pass
-
