@@ -10,5 +10,5 @@ supported_formats = {'csv': load_csv,
 
 
 # Team 1
-def load_files(files_paths: list):
+def load_files(files_paths: list, load_params: list):
     pass
