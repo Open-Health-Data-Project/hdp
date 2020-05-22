@@ -12,7 +12,6 @@ def load_csv(csv_files: list):
 
 
 # Team 1
-PATHS=["sample.json"]
 def load_json(txt_files: list):
     exception_dict = dict()
     data_table_list = list()
@@ -28,7 +27,6 @@ def load_json(txt_files: list):
         except ValueError:
             exception_dict = {path: "ValueError"}
     return data_table_list, exception_dict
-print(load_json(PATHS))
 
 # Team 1
 def load_xlsx(xlsx_files: list):
