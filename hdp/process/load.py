@@ -12,6 +12,7 @@ def load_csv(csv_files: list):
 
 
 # Team 1
+PATHS=["sample.json"]
 def load_json(txt_files: list):
     exception_dict = dict()
     data_table_list = list()
@@ -21,11 +22,13 @@ def load_json(txt_files: list):
             with(open(path, "r")) as file:
                 for line in file:
                     data += line.strip()
+            data_table=pd.read_json(data,orient="index")
+            data_table.name=path
             data_table_list.append(pd.read_json(data,orient="index"))
         except ValueError:
             exception_dict = {path: "ValueError"}
     return data_table_list, exception_dict
-
+print(load_json(PATHS))
 
 # Team 1
 def load_xlsx(xlsx_files: list):
