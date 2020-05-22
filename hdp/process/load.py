@@ -1,5 +1,14 @@
 import pandas as pd
 from hdp.struct.datatable import DataTable
+from pathlib import Path
+
+
+def _get_file_name(path):
+    if isinstance(path, Path):
+        name = path.name
+    else:
+        name = Path(str(path)).name
+    return name
 
 
 # Team 1
@@ -7,64 +16,101 @@ def clean_up(datatable_list):
     pass
 
 
-# Team 1
-def load_csv(csv_files: list):
+def load_csv(csv_files: list, params: dict):
+    """
+    Read list of CSV files.
+
+    Parameters
+    ----------
+    csv_files: list of paths
+        Path objects from pathlib and string convertible
+        paths are supported.
+
+    params: dict
+        Parameters to pass to Pandas read_csv function.
+
+    Returns
+    -------
+    DataTable list:
+        List of parsed DataTable objects with file name and DataFrame attributes filled.
+
+    Exceptions dictionary:
+        Dictionary with files names as keys and exceptions strings as values.
+        Contains only files where an exception occurred.
+    """
     data_table_list = []
     exceptions = {}
     for path in csv_files:
         data_table = DataTable()
+        name = _get_file_name(path)
         try:
-            data_table.df = pd.read_csv(path)
-        except FileNotFoundError:
-            exceptions[path] = "File does not exist"
-        except ValueError:
-            exceptions[path] = "Invalid path or object not string"
+            data_table.df = pd.read_csv(path, **params)
         except Exception as exc:
-            exceptions[path] = str(exc)
+            exceptions[name] = str(exc)
         else:
-            data_table.name = path
+            data_table.name = name
             data_table_list.append(data_table)
-
     return data_table_list, exceptions
 
 
 # Team 1
-def load_json(txt_files: list):
-    exception_dict = dict()
-    data_table_list = list()
-    data = str()
-    for path in txt_files:
+def load_json(json_files: list, params: dict):
+    """
+    Read list of JSON files.
+
+    Parameters
+    ----------
+    json_files: list of paths
+        Path objects from pathlib and string convertible
+        paths are supported.
+
+    params: dict
+        Parameters to pass to Pandas read_json function.
+
+    Returns
+    -------
+    DataTable list:
+        List of parsed DataTable objects with file name and DataFrame attributes filled.
+
+    Exceptions dictionary:
+        Dictionary with files names as keys and exceptions strings as values.
+        Contains only files where an exception occurred.
+    """
+    data_table_list = []
+    exceptions = {}
+    for path in json_files:
+        data_table = DataTable()
+        name = _get_file_name(path)
         try:
-            with(open(path, "r")) as file:
-                for line in file:
-                    data += line.strip()
-            data_table=pd.read_json(data,orient="index")
-            data_table.name=path
-            data_table_list.append(pd.read_json(data,orient="index"))
-        except ValueError:
-            exception_dict = {path: "ValueError"}
-    return data_table_list, exception_dict
+            data_table.df = pd.read_json(path, **params)
+        except Exception as exc:
+            exceptions[name] = str(exc)
+        else:
+            data_table.name = name
+            data_table_list.append(data_table)
+    return data_table_list, exceptions
+
 
 # Team 1
-def load_xlsx(xlsx_files: list):
+def load_xlsx(xlsx_files: list, params: dict):
     pass
 
 
 # Team 1
-def load_xls(xls_files: list):
+def load_xls(xls_files: list, params: dict):
     pass
 
 
 # Team 3
-def load_gpx(gpx_files: list):
+def load_gpx(gpx_files: list, params: dict):
     pass
 
 
 # Team 3
-def load_tcx(tcx_files: list):
+def load_tcx(tcx_files: list, params: dict):
     pass
 
 
 # Team 4
-def load_jpg(jpg_files: list):
+def load_jpg(jpg_files: list, params: dict):
     pass
