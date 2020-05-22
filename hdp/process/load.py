@@ -1,4 +1,5 @@
 import pandas as pd
+from hdp.struct.datatable import DataTable
 
 
 # Team 1
@@ -8,7 +9,23 @@ def clean_up(datatable_list):
 
 # Team 1
 def load_csv(csv_files: list):
-    pass
+    data_table_list = []
+    exceptions = {}
+    for path in csv_files:
+        data_table = DataTable()
+        try:
+            data_table.df = pd.read_csv(path)
+        except FileNotFoundError:
+            exceptions[path] = "File does not exist"
+        except ValueError:
+            exceptions[path] = "Invalid path or object not string"
+        except Exception as exc:
+            exceptions[path] = str(exc)
+        else:
+            data_table.name = path
+            data_table_list.append(data_table)
+
+    return data_table_list, exceptions
 
 
 # Team 1
