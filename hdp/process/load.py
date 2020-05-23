@@ -47,12 +47,48 @@ def load_json(txt_files: list):
 
 # Team 1
 def load_xlsx(xlsx_files: list):
-    pass
+    exceptions_dictionary = {}
+    data_table_list = []
+    data_table = DataTable()
+
+    for path in xlsx_files:
+        try:
+            data_table = pd.read_excel(path)
+
+        except ValueError:
+            exceptions_dictionary[path] = 'Invalid path or object not string'
+
+        except Exception as exc:
+            exceptions_dictionary[path] = str(exc)
+
+        else:
+            data_table.name = path
+            data_table_list.append(data_table)
+
+    return data_table_list, exceptions_dictionary
 
 
 # Team 1
 def load_xls(xls_files: list):
-    pass
+    exceptions_dictionary = {}
+    data_table_list = []
+    data_table = DataTable()
+
+    for path in xls_files:
+        try:
+            data_table = pd.read_excel(path)
+
+        except ValueError:
+            exceptions_dictionary[path] = 'Invalid path or object not string'
+
+        except Exception as exc:
+            exceptions_dictionary[path] = str(exc)
+
+        else:
+            data_table.name = path
+            data_table_list.append(data_table)
+
+    return data_table_list, exceptions_dictionary
 
 
 # Team 3
