@@ -20,4 +20,4 @@ class DataTable:
 
 # Examples:
 subcategory = PhysicalActivity()
-subcategories = {["A", "B", "C"]: PhysicalActivity(), ["D"]: Sleep()}
+subcategories = {("A", "B", "C"): PhysicalActivity(), ("D"): Sleep()}
