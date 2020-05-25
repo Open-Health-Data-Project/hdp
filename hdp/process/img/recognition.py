@@ -1,10 +1,19 @@
 # Team 4
-import PIL.Image
-import PIL.ImageDraw
 import face_recognition
 import cv2
+import exifread
 
 def recognize_face(file):
+    # Load the image into a Python Image Library object so that we can draw on top of it and display it
+    image_output = cv2.imread(file)
+    image_marked=image_output.copy()
+    directory = "recognized_faces\\"
+
+    with open(file, 'rb') as fh:
+        tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
+        dateTaken = tags["EXIF DateTimeOriginal"]
+        print(dateTaken)
+
     # Load the jpg file into a numpy array
     image = face_recognition.load_image_file(file)
 
@@ -14,13 +23,7 @@ def recognize_face(file):
     number_of_faces = len(face_locations)
     print("I found {} face(s) in this photograph.".format(number_of_faces))
 
-    # Load the image into a Python Image Library object so that we can draw on top of it and display it
-    #pil_image = PIL.Image.fromarray(image)
-    image_output = cv2.imread(file)
-    image_marked=image_output.copy()
-    directory = "recognized_faces\\"
     counter=1
-
     for face_location in face_locations:
 
         # Print the location of each face in this image. Each face is a list of co-ordinates in (top, right, bottom, left) order.
@@ -44,11 +47,8 @@ def recognize_face(file):
 
         cv2.imwrite(directory+str(counter)+".jpg", crop_img)
         counter+=1
-        #draw = PIL.ImageDraw.Draw(pil_image)
-        #draw.rectangle([left, top, right, bottom], outline="red")
 
     # Display the image on screen
-    #pil_image.show()
     cv2.imshow(window_name, image_marked)
     cv2.waitKey()
 
