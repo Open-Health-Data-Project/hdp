@@ -3,11 +3,19 @@ import face_recognition
 import cv2
 import exifread
 
+class face:
+    def __init__(self, photo, date_taken, dir):
+        self.photo = photo
+        self.date_taken = date_taken
+        self.dir = dir
+
+
 def recognize_face(file):
     # Load the image into a Python Image Library object so that we can draw on top of it and display it
     image_output = cv2.imread(file)
     image_marked=image_output.copy()
     directory = "recognized_faces\\"
+    recognized_faces=[]
 
     with open(file, 'rb') as fh:
         tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
@@ -44,12 +52,18 @@ def recognize_face(file):
         image_marked= cv2.rectangle(image_marked, start_point, end_point, color, thickness)
 
         crop_img = image_output[top:bottom, left:right].copy()
-
-        cv2.imwrite(directory+str(counter)+".jpg", crop_img)
+        dir=directory+str(counter)+".jpg"
+        cv2.imwrite(dir, crop_img)
+        recognized_faces.append(face(crop_img,dateTaken,dir))
         counter+=1
 
     # Display the image on screen
     cv2.imshow(window_name, image_marked)
     cv2.waitKey()
 
-recognize_face("people.jpg")
+    return recognized_faces
+
+list_of_faces = recognize_face("people.jpg")
+
+for item in list_of_faces:
+    print(item.dir)
