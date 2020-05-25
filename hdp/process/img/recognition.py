@@ -4,10 +4,12 @@ import cv2
 import exifread
 
 class face:
-    def __init__(self, photo, date_taken, dir):
+    possible_composition = "straight", "left-side", "right-side", "portrait", None
+    def __init__(self, photo, date_taken, dir, composition=None):
         self.photo = photo
         self.date_taken = date_taken
         self.dir = dir
+        self.composition = composition if composition in face.possible_composition else None
 
 
 def recognize_face(file):
@@ -36,7 +38,7 @@ def recognize_face(file):
 
         # Print the location of each face in this image. Each face is a list of co-ordinates in (top, right, bottom, left) order.
         top, right, bottom, left = face_location
-        print("A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
+        #print("A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
 
         # Let's draw a box around the face
         margin = (bottom - top)//2
