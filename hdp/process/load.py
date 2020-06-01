@@ -49,6 +49,7 @@ def load_csv(csv_files: list, params: dict):
             exceptions[name] = str(exc)
         else:
             data_table.name = name
+            data_table.path = path
             data_table_list.append(data_table)
     return data_table_list, exceptions
 
