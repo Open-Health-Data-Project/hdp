@@ -13,7 +13,18 @@ class Profile:
     def __init__(self, name=""):
         self.name = name
 
-    def add_data(self, datatable, cleandata, extension, image=None, load_errors=None):
+    def add_data(self, datatables, load_params, extension, load_errors):
+        cleandata_list = []
+        for datatable in datatables:
+            datatable.load_parameters = load_params
+            cleandata_list.append(datatable.clean)
+        self.datatables.extend(datatables)
+        self.cleandata.extend(cleandata_list)
+        if extension not in self.extensions:
+            self.extensions.append(extension)
+        self.load_errors.update(load_errors)
+
+    def add_all_data(self, datatable, cleandata, extension, image=None, load_errors=None):
         if isinstance(datatable, DataTable) and isinstance(cleandata, CleanData) and isinstance(extension, str):
             self.extensions.append(extension)
             self.datatables.append(datatable)
@@ -45,5 +56,5 @@ class Profile:
 
 # Examples of usage
 pr = Profile()
-pr.add_data(dts, cds, ['csv', 'csv'], load_errors={r"C://example/example.file": "File not found"})
+pr.add_all_data(dts, cds, ['csv', 'csv'], load_errors={r"C://example/example.file": "File not found"})
 print(pr.get_data())

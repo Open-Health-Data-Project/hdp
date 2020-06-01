@@ -1,7 +1,7 @@
-import pandas as pd
 from hdp.struct.metadata import Metadata
 from hdp.struct.metadata import md
 from hdp.struct.categories import *
+from hdp.struct.cleandata import *
 from enum import Enum
 
 
@@ -32,15 +32,18 @@ class DataTable:
     category = None  # General type of data for example Health, Food, Activity, Environment, Sleep etc. as string
     df = pd.DataFrame()
     meta = Metadata()
+    clean = CleanData()
     subcategory = PhysicalActivity()  # One subcategory for the whole table, if it's common for every column
     subcategories = {}  # Subcategories for subset of rows if necessary
     relations = []
     problems = {}
+    load_parameters = {}
 
     def to_pandas(self):
         df_dict = {'dt': self.df, 'meta': self.meta.to_dataframe()}
         dt_series = pd.Series({**{'name': self.name, 'path': self.path, 'frequency': self.frequency,
-                               'row_full': self.row_full, 'category': self.category}, **self.problems})
+                               'row_full': self.row_full, 'category': self.category}, **self.problems,
+                               **self.load_parameters})
         series_dict = {'dt_meta': dt_series, 'subcategory': self.subcategory.to_series()}
         for columns, subcategory in self.subcategories.items():
             series_dict[columns] = subcategory.to_series()
