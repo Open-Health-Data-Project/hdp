@@ -32,7 +32,7 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
         """
     if mode == 'flag':
         try:
-            dt_time = pd.to_datetime("01-01-1970 " + time, 'ignore', format="%d-%m-%Y " + time_format)
+            dt_time = pd.to_datetime(time, 'ignore', format=time_format)
             return pd.to_timedelta(str(dt_time.time()))
         except (TypeError, AttributeError):
             return str(time)
