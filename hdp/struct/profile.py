@@ -44,11 +44,12 @@ class Profile:
 
     def get_data(self):
         data = {}
-        for extension, dt, cd in zip(self.extensions, self.datatables, self.cleandata):
-            if extension not in data.keys():
-                data[extension] = [[dt.to_pandas()] + [cd.to_dataframe()]]
+        for extension, dt in zip(self.extensions, self.datatables):
+            if extension not in ('tcx', 'gpx', 'jpg'):
+                data[dt.name] = dt.to_pandas()
             else:
-                data[extension].append(dt.to_pandas() + [cd.to_dataframe()])
+                data['native_format'] = {}
+                data['native_format'][dt.name] = dt.to_pandas()
         data['images'] = self.images
         data['load_errors'] = self.load_errors
         return data
@@ -56,5 +57,5 @@ class Profile:
 
 # Examples of usage
 pr = Profile()
-pr.add_all_data(dts, cds, ['csv', 'csv'], load_errors={r"C://example/example.file": "File not found"})
+pr.add_all_data(dt, cd, 'csv', load_errors={r"C://example/example.file": "File not found"})
 print(pr.get_data())

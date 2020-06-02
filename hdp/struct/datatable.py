@@ -40,16 +40,20 @@ class DataTable:
     load_parameters = {}
 
     def to_pandas(self):
-        df_dict = {'dt': self.df, 'meta': self.meta.to_dataframe()}
+        name = self.name
         dt_series = pd.Series({**{'name': self.name, 'path': self.path, 'frequency': self.frequency,
                                'row_full': self.row_full, 'category': self.category}, **self.problems,
                                **self.load_parameters})
-        series_dict = {'dt_meta': dt_series, 'subcategory': self.subcategory.to_series()}
+        data = {name: self.df, name + '_columns_meta': self.meta.to_dataframe(), name + '_meta': dt_series,
+                name + '_subcategories': {'table': self.subcategory.to_series()}, name + '_relations': {},
+                name + '_clean': self.clean.to_dataframe()}
         for columns, subcategory in self.subcategories.items():
-            series_dict[columns] = subcategory.to_series()
+            data[name + '_subcategories'][columns] = subcategory.to_series()
         for num, relation in enumerate(self.relations):
-            series_dict['relation:' + str(num)] = relation.to_series()
-        return [df_dict, series_dict]
+            data[name + '_relations']['relation:' + str(num)] = relation.to_series()
+        data[name + '_subcategories'] = pd.DataFrame(data[name + '_subcategories'])
+        data[name + '_relations'] = pd.DataFrame(data[name + '_relations'])
+        return data
 
 
 # Examples:
@@ -69,9 +73,7 @@ dt.subcategory = PhysicalActivity()
 dt.subcategories = {("A", "B", "C"): PhysicalActivity(), ("D"): PhysicalActivity()}
 dt.relations = [rel]
 dt.problems = {'A': 5, 'B': 'Example', 'C:dtype': 'str', 'possible_indexes': ('C', 'D'), 'not_unique_index': 'A'}
-
-# Two copies of the same DataTable used only for testing
-dts = [dt, dt]
+dt.clean = cd
 
 
 
