@@ -40,7 +40,7 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
     elif mode == 'regex':
         if re_compiler(format) is True:
             try:
-                return pd.to_timedelta(re.search(time_format, time).group())  # Removing microseconds
+                return pd.to_timedelta(re.search(time_format, time).group())
             except AttributeError:
                 return str(time)
         else:
