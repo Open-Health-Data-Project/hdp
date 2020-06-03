@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 class Subcategory:
     table = True
     columns = []  # Subcategory is many-to-one relation, so many columns from DataTable object can be assigned to
@@ -12,9 +15,15 @@ class PhysicalActivity(Subcategory):
     min_speed = 0
     max_speed = 0
     gps_data = False
-    bpm_data = False
+    hr_data = False
     wind_data = False
     altitude_data = False
+
+    def to_series(self):
+        data = {'enviroment': self.environment, 'category': self.category, 'kind': self.kind,
+                'min_speed': self.min_speed, 'max_speed': self.max_speed, 'gps_data': self.gps_data,
+                'hr_data': self.hr_data, 'wind_data': self.wind_data, 'altitude_data': self.altitude_data}
+        return pd.Series(data)
 
 
 class Nutrients(Subcategory):
@@ -43,3 +52,4 @@ class MedicalData(Subcategory):
 
 class EntertainmentData(Subcategory):
     pass
+
