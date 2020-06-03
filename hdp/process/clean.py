@@ -38,14 +38,9 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
             return str(time)
 
     elif mode == 'regex':
-        try:
-            re.compile(time_format)
-            is_valid = True
-        except re.error:
-            is_valid = False
-        if is_valid:
+        if re_compiler(format) is True:
             try:
-                return pd.to_timedelta(re.search(time_format, time).string.split('.')[0])  # Removing microseconds
+                return pd.to_timedelta(re.search(time_format, time).group())
             except AttributeError:
                 return str(time)
         else:
@@ -185,3 +180,15 @@ def clean_data(datatables: list, meta: list, clean_prop: list):
     set_categorical(datatables, clean_prop)
 
 
+def re_compiler(format: str) -> bool:
+    """
+    :param format: raw string with regex pattern
+    :return: bool True if regex compiles, else False
+    """
+
+    try:
+        re.compile(format)
+        return True
+
+    except re.error:
+        return False
