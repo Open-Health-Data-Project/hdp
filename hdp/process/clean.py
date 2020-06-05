@@ -1,5 +1,6 @@
 import pandas as pd
 import re
+
 default_units = {'speed': 'km/h',
                  'distance': 'km',
                  'weight': 'kg',
@@ -18,8 +19,13 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
         time: string
 
         time_format: string
-            It could contain valid flag for pd.to_datetime function - if mode = flag or
-            raw string with regex - if mode = regex, default = None
+            if mode = flag : valid flags for pd.to_datetime function
+            if mode = regex : raw string with regex. Each unit of time to be included in the result
+                              should be named group of regex. One of the following values should be used as a key:
+                              {'days', 'seconds', 'microseconds', 'milliseconds', 'minutes', 'hours', 'weeks'}
+                              Example of valid regex:
+                              r"(?P<hours>[\d]{0,2})\:?(?P<minutes>[\d]{2})\:(?P<seconds>[\d]{2}).[\d]{3}"
+            default = None : Default call of to_timedelta function without flags
 
         mode: string with value 'flag' or 'regex'
             Flag for using flag mode (matching time using flags recognised by pd.to_datetime,
@@ -27,21 +33,29 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
 
         Returns
         -------
-        pd.Timedelta object
-            If operation was successful else returns time parameter unchanged.
+        pd.Timedelta object if operation was successful, else returns time parameter as a string.
         """
+    possible_keys = {'days', 'seconds', 'microseconds', 'milliseconds', 'minutes', 'hours', 'weeks'}
     if mode == 'flag':
         try:
-            dt_time = pd.to_datetime(time, 'ignore', format=time_format)
+            if time_format is not None:
+                dt_time = pd.to_datetime(time, 'ignore', format=time_format)
+            else:
+                dt_time = pd.to_datetime(time, 'ignore')
             return pd.to_timedelta(str(dt_time.time()))
         except (TypeError, AttributeError):
             return str(time)
 
     elif mode == 'regex':
-        if re_compiler(format) is True:
+        if re_compiler(time_format) is True:
             try:
-                return pd.to_timedelta(re.search(time_format, time).group())
-            except AttributeError:
+                time_dict = re.search(time_format, time).groupdict()
+                time_dict = {k if k in possible_keys else None: 0 if v == '' else int(v) for k, v in time_dict.items()}
+                if None in time_dict.keys():
+                    raise KeyError
+                else:
+                    return pd.Timedelta(**time_dict)
+            except (AttributeError, KeyError):
                 return str(time)
         else:
             return str(time)
@@ -59,7 +73,6 @@ def convert_units(datatables: list):
 
 # Team 2
 def clean_data(datatables: list, meta: list, clean_prop: list):
-
     def set_meta_obj(dt_list, meta_list):
         """
         Function to set right Metadata object as a DataTable.meta attribute
