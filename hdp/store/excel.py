@@ -2,22 +2,25 @@
 import pandas as pd
 from hdp.struct.profile import Profile
 
-# df1 = pd.DataFrame([['a', 'b'], ['c', 'd']])
-# df2 = pd.DataFrame([['1', '2'], ['6', '8']])
+
+def profile_file(name):
+    with open('profile.txt', 'w') as profile:
+        profile.write('Profile: ' + name + '\n')
+        profile.write('Directory: ' + '\n')
+        profile.write('Files: ' + '\n')
 
 
-def save_to_excel(name, datatable, directory=None):
+def save_to_excel(datatable, directory=None):
     for key, file in datatable.items():
-        for items in file:
-            for item in items:
-                if type(item) is list:
-                    for i in item:
-                        if isinstance(i, dict):
-                            for k, v in i.items():
-                                if directory is None and isinstance(v, pd.DataFrame) or isinstance(v, pd.Series):
-                                    v.to_excel(name + '_' + '.xlsx', encoding='utf-8')
-                else:
-                    continue
+        if key is 'load_errors':
+            error = pd.Series(file, dtype='str')
+            error.to_excel(key + '.xlsx')
+        else:
+            for i in file:
+                if isinstance(file[i], pd.DataFrame) or isinstance(file[i], pd.Series):
+                    file[i].to_excel(i + '.xlsx')
+                    with open('profile.txt', 'a') as profile:
+                        profile.write(i + '.xlsx\n')
 
 
 def open_excel(file, directory=None):
@@ -25,26 +28,7 @@ def open_excel(file, directory=None):
     print(df)
 
 
-# pseudodata = {'rozszerzenie_1': [
-#   [
-#     'file.cs',
-#     [
-#       {
-#         'dt': df2,
-#         'meta': df1
-#       },
-#       {
-#         'dt_meta': df1,
-#         'subcategory': df1,
-#         'relation:0': df1,
-#         'relation:n': df1
-#       }
-#     ],
-#     df1
-#   ],
-# ]
-# }
 pr = Profile()
-print(pr.get_data())
-save_to_excel('excercise', pr.get_data())
-open_excel('excercise_.xlsx')
+print('*' * 40)
+profile_file(pr.name)
+save_to_excel(pr.get_data())
