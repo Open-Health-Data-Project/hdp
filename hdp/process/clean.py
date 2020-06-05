@@ -38,11 +38,11 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
     possible_keys = {'days', 'seconds', 'microseconds', 'milliseconds', 'minutes', 'hours', 'weeks'}
     if mode == 'flag':
         try:
-            if time_format is not None:
-                dt_time = pd.to_datetime(time, 'ignore', format=time_format)
-            else:
-                dt_time = pd.to_datetime(time, 'ignore')
-            return pd.to_timedelta(str(dt_time.time()))
+            dt_time = pd.to_datetime(time, 'ignore', format=time_format)
+            try:
+                return pd.to_timedelta(dt_time)
+            except ValueError:
+                return pd.to_timedelta(str(dt_time.time()))
         except (TypeError, AttributeError):
             return str(time)
 
@@ -195,8 +195,15 @@ def clean_data(datatables: list, meta: list, clean_prop: list):
 
 def re_compiler(format: str) -> bool:
     """
-    :param format: raw string with regex pattern
-    :return: bool True if regex compiles, else False
+    Checks if provided regex is valid
+
+    Parameters
+    ----------
+    format: raw string with regex pattern
+
+    Returns
+    -------
+    bool True if regex compiles, else False
     """
 
     try:
@@ -205,3 +212,5 @@ def re_compiler(format: str) -> bool:
 
     except re.error:
         return False
+
+
