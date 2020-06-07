@@ -44,15 +44,15 @@ class DataTable:
         dt_series = pd.Series({**{'name': self.name, 'path': self.path, 'frequency': self.frequency,
                                'row_full': self.row_full, 'category': self.category}, **self.problems,
                                **self.load_parameters})
-        data = {name: self.df, name + '_columns_meta': self.meta.to_dataframe(), name + '_meta': dt_series,
-                name + '_subcategories': {'table': self.subcategory.to_series()}, name + '_relations': {},
-                name + '_clean': self.clean.to_dataframe()}
+        data = {'data': self.df, 'columns_meta': self.meta.to_dataframe(), 'meta': dt_series.to_frame(),
+                'subcategories': {'table': self.subcategory.to_series()}, 'relations': {},
+                'clean': self.clean.to_dataframe()}
         for columns, subcategory in self.subcategories.items():
-            data[name + '_subcategories'][columns] = subcategory.to_series()
+            data['subcategories'][columns] = subcategory.to_series()
         for num, relation in enumerate(self.relations):
-            data[name + '_relations']['relation:' + str(num)] = relation.to_series()
-        data[name + '_subcategories'] = pd.DataFrame(data[name + '_subcategories'])
-        data[name + '_relations'] = pd.DataFrame(data[name + '_relations'])
+            data['relations']['relation:' + str(num)] = relation.to_series()
+        data['subcategories'] = pd.DataFrame(data['subcategories'])
+        data['relations'] = pd.DataFrame(data['relations'])
         return data
 
 
