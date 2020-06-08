@@ -28,7 +28,7 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
             default = None : Default call of to_timedelta function without flags
 
         mode: string with value 'flag' or 'regex'
-            Flag for using flag mode (matching time using flags recognised by pd.to_datetime,
+            flag for using flag mode (matching time using flags recognised by pd.to_datetime),
             regex for using regex patterns matching time
 
         Returns
@@ -50,11 +50,8 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
         if re_compiler(time_format) is True:
             try:
                 time_dict = re.search(time_format, time).groupdict()
-                time_dict = {k if k in possible_keys else None: 0 if v == '' else int(v) for k, v in time_dict.items()}
-                if None in time_dict.keys():
-                    raise KeyError
-                else:
-                    return pd.Timedelta(**time_dict)
+                time_dict = dict_comprehension(possible_keys, time_dict)
+                return pd.Timedelta(**time_dict)
             except (AttributeError, KeyError):
                 return str(time)
         else:
@@ -62,8 +59,44 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
 
 
 # Team 2
-def convert_date(date: str, format, mode: str):
-    pass
+def convert_date(date: str, date_format: str = None, mode: str = 'flag'):
+    """
+
+    Parameters
+    ----------
+    date : date in string format
+    date_format: string
+        if mode = flag : valid flags for pd.to_datetime function
+        if mode = regex : raw string with regex. Each unit of date to be included in the result
+                          should be named group of regex. One of the following values should be used as a key:
+                          {'year', 'month', 'day', 'hour', 'minute', 'second', 'time_zone'}
+                          Example of valid regex:
+                          r"(?P<day>[\d]{2}) (?P<month>[\w]{3}) (?P<year>[\d]{2})"
+        default = None : Default call of to_datetime function without flags
+    mode : string
+        flag for using flag mode (matching date using flags recognised by pd.to_datetime),
+        regex for using regex patterns matching date
+    Returns
+    -------
+    pd.Timestamp object if operation was successful, else returns date parameter as a string.
+
+    """
+    possible_keys = {'year', 'month', 'day', 'hour', 'minute', 'second', 'time_zone'}
+    if mode == 'flag':
+        try:
+            return pd.to_datetime(date, 'ignore', format=date_format)
+        except ValueError:
+            return str(date)
+    elif mode == 'regex':
+        if re_compiler(date_format) is True:
+            try:
+                date_dict = re.search(date_format, date).groupdict()
+                date_dict = dict_comprehension(possible_keys, date_dict)
+                return pd.Timestamp(**date_dict)
+            except (AttributeError, KeyError):
+                return str(date)
+        else:
+            return str(date)
 
 
 # Team 2
@@ -214,3 +247,51 @@ def re_compiler(format: str) -> bool:
         return False
 
 
+def get_month_number(value: str) -> int:
+    """
+
+    Parameters
+    ----------
+    value: string containing short or full month name - min 3 chars long
+
+    Returns
+    -------
+    int representing month number
+    """
+    return {'jan': 1,
+            'feb': 2,
+            'mar': 3,
+            'apr': 4,
+            'may': 5,
+            'jun': 6,
+            'jul': 7,
+            'aug': 8,
+            'sep': 9,
+            'oct': 10,
+            'nov': 11,
+            'dec': 12
+            }[value[:3].lower()]
+
+
+def dict_comprehension(possible_keys: set, initial_dict: dict) -> dict:
+    """
+
+    Parameters
+    ----------
+    possible_keys: set with strings representing possible keys expected in the dictionary
+    initial_dict: dictionary created using groupdict method on re.search object
+
+    Returns
+    -------
+    dictionary validated for containing relevant keys
+
+    """
+    for k, v in initial_dict.copy().items():
+        try:
+            initial_dict[k] = int(v)
+        except ValueError:
+            initial_dict[k] = get_month_number(v)
+    new_dict = {k if k in possible_keys else None: 0 if v == '' else int(v) for k, v in initial_dict.items()}
+    if None in new_dict.keys():
+        raise KeyError
+    return new_dict
