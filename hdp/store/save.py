@@ -1,7 +1,11 @@
 # Team 5
+import os.path
 import os
 import pandas as pd
 from pathlib import Path
+from hdp.struct.profile import Profile
+
+pr = Profile()
 
 
 def _save_file(data, file_name, directory, mode, save_params):
@@ -27,7 +31,7 @@ def save_to_excel(name, spreadsheet, directory, save_params):
 
 
 def save_data(profile, mode, directory=Path(r"data/"), save_params=None):
-    profile = profile.get_data()
+    # profile = pr.get_data()
     if save_params is None:
         save_params = {}
     if isinstance(directory, str):
@@ -56,10 +60,58 @@ def save_data(profile, mode, directory=Path(r"data/"), save_params=None):
                                 _save_file(data, file_name, directory_meta, mode, save_params)
                 else:
                     save_to_excel(name, file, directory, save_params)
-    # with open('saved_files.txt', 'w') as f:
-    #    f.write(directory)
-    print(str(directory))
+    with open('saved{}_files.txt'.format('_'+mode), 'w') as f:
+        f.write(profile['name'] + '\n')
+        f.write(str(directory))
+    # print(str(directory))
+    # print(profile)
+    # print(profile.keys())
 
 
-def read_data():
-    pass
+def _read_files(profile_name, mode):
+    with open('saved_{}_files.txt'.format(mode), 'r+') as f:
+        for line in f:
+            if line.startswith(profile_name):
+                directory = next(f) + r'\\'
+                # print(directory)
+                return directory
+
+
+def read_data(profile_name, file_name, mode):
+    if mode == 'excel':
+        path = _read_files(profile_name, 'excel') + file_name
+        if os.path.isfile(path):
+            df = pd.read_excel(path, sheet_name=None)
+            print(df)
+    elif mode == 'csv':
+        path = _read_files(profile_name, 'csv') + file_name
+        if os.path.isfile(path):
+            df = pd.read_csv(path)
+            print(df)
+        else:
+            for key in pr.get_data().keys():
+                if key == 'name' or key == 'images' or key == 'load_errors':
+                    continue
+                else:
+                    path = _read_files(profile_name, 'csv') + key + r'_metadata\\' + file_name
+                    if os.path.isfile(path):
+                        df = pd.read_csv(path)
+                        print(df)
+    elif mode == 'json':
+        path = _read_files(profile_name, 'json') + file_name
+        if os.path.isfile(path):
+            df = pd.read_json(_read_files(profile_name, 'json') + file_name)
+            print(df)
+        else:
+            for key in pr.get_data().keys():
+                if key == 'name' or key == 'images' or key == 'load_errors':
+                    continue
+                else:
+                    path = _read_files(profile_name, 'json') + key + r'_metadata\\' + file_name
+                    if os.path.isfile(path):
+                        df = pd.read_csv(path)
+                        print(df)
+
+
+save_data(pr.get_data(), 'csv')
+read_data(pr.name, 'Example_clean.json', 'json')
