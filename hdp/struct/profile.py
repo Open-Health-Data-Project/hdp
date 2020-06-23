@@ -43,19 +43,20 @@ class Profile:
             self.load_errors = {**self.load_errors, **load_errors}
 
     def get_data(self):
-        data = {}
+        data = {'name': self.name}
         for extension, dt in zip(self.extensions, self.datatables):
             if extension not in ('tcx', 'gpx', 'jpg'):
                 data[dt.name] = dt.to_pandas()
             else:
                 data['native_format'] = {}
-                data['native_format'][dt.name] = dt.to_pandas()
+                data['native_format'][dt.name + '.' + extension] = dt.to_pandas()
         data['images'] = self.images
-        data['load_errors'] = self.load_errors
+        data['load_errors'] = pd.Series(self.load_errors).to_frame()
         return data
 
 
 # Examples of usage
 pr = Profile()
 pr.add_all_data(dt, cd, 'csv', load_errors={r"C://example/example.file": "File not found"})
+pr.name = "user1"
 print(pr.get_data())
