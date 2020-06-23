@@ -1,3 +1,4 @@
-.idea
-.pyc
-.xml
+*.iml
+*.xml
+*.pyc
+*.idea

@@ -13,7 +13,40 @@ def _get_file_name(path):
 
 # Team 1
 def clean_up(datatable_list):
-    pass
+    """
+    Perform basic data cleaning.
+
+    Parameters
+    ----------
+    datatable_list: list of DataTable objects
+
+    Returns
+    -------
+    DataTable list:
+        List of cleaned DataTable objects.
+    """
+    for datatable in datatable_list:
+        df = datatable.df
+        df.dropna(how='all', axis=0, inplace=True)
+        df.dropna(how='all', axis=1, inplace=True)
+        for column in df:
+            if df[column].nunique() == 1:
+                datatable.problems[column] = df.loc[column, 0]
+        no_numeric_dtypes = {column + ':dtype': str(dtype) for column, dtype in zip(df.dtypes.index, df.dtypes.values)
+                             if dtype == 'str' or dtype == 'object'}
+        datatable.problems.update(no_numeric_dtypes)
+        datetime_columns = [column for column, dtype in zip(df.dtypes.index, df.dtypes.values)
+                            if dtype == 'datetime64[ns]']
+        if len(datetime_columns) == 1:
+            df.set_index(datetime_columns[0], inplace=True)
+        elif len(datetime_columns) != 0:
+            datatable.problems['possible_indexes'] = tuple(datetime_columns)
+        if not df.index.is_unique:
+            datatable.problems['no_unique_index'] = df.index.name
+        datatable.clean.column_info = dict(df.count() / len(df))
+        datatable.df = df
+
+    return datatable_list
 
 
 def load_csv(csv_files: list, params: dict):
