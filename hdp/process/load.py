@@ -193,17 +193,20 @@ def load_tcx(tcx_files: list, params: dict):
     for path in tcx_files:
         try:
             name = _get_file_name(path)
-            with(open(path,"r")) as file:
-                activity = BeautifulSoup(file,'lxml')
+            with (open(path, "r")) as file:
+                activity = BeautifulSoup(file, "lxml")
             for trackpoint in activity.find_all("trackpoint"):
-                point = {element.name: element.text for element in trackpoint.children if
-                         isinstance(element, Tag) and len(element.findChildren()) == 0}
+                point = {
+                    element.name: element.text
+                    for element in trackpoint.children
+                    if isinstance(element, Tag) and len(element.findChildren()) == 0
+                }
                 for element in trackpoint.children:
-                    if isinstance(element,Tag) and len(element.findChildren())>1:
+                    if isinstance(element, Tag) and len(element.findChildren()) > 1:
                         for value in element.children:
-                            if isinstance(value,NavigableString):
+                            if isinstance(value, NavigableString):
                                 point[value.name] = value.string
-                            elif isinstance(value,Tag):
+                            elif isinstance(value, Tag):
                                 point[value.name] = value.text.strip()
                     activites.append(point)
             data_table.df = pd.DataFrame(activites)
@@ -218,4 +221,3 @@ def load_tcx(tcx_files: list, params: dict):
 # Team 4
 def load_jpg(jpg_files: list, params: dict):
     pass
-
