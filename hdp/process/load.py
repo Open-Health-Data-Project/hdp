@@ -1,4 +1,7 @@
 import pandas as pd
+from bs4 import BeautifulSoup
+from bs4 import NavigableString, Tag
+
 from hdp.struct.datatable import DataTable
 from pathlib import Path
 
@@ -183,9 +186,36 @@ def load_gpx(gpx_files: list, params: dict):
 
 # Team 3
 def load_tcx(tcx_files: list, params: dict):
-    pass
+    exceptions_dict = {}
+    data_table_list = []
+    data_table = DataTable()
+    activites = []
+    for path in tcx_files:
+        try:
+            name = _get_file_name(path)
+            with(open(path,"r")) as file:
+                activity = BeautifulSoup(file,'lxml')
+            for trackpoint in activity.find_all("trackpoint"):
+                point = {element.name: element.text for element in trackpoint.children if
+                         isinstance(element, Tag) and len(element.findChildren()) == 0}
+                for element in trackpoint.children:
+                    if isinstance(element,Tag) and len(element.findChildren())>1:
+                        for value in element.children:
+                            if isinstance(value,NavigableString):
+                                point[value.name] = value.string
+                            elif isinstance(value,Tag):
+                                point[value.name] = value.text.strip()
+                    activites.append(point)
+            data_table.df = pd.DataFrame(activites)
+        except Exception as e:
+            exceptions_dict[name] = str(e)
+        else:
+            data_table.name = name
+            data_table_list.append(data_table)
+    return data_table_list, exceptions_dict
 
 
 # Team 4
 def load_jpg(jpg_files: list, params: dict):
     pass
+
