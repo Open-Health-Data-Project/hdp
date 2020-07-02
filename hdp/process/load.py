@@ -19,7 +19,7 @@ def clean_up(datatable_list):
     pass
 
 
-def load_csv(csv_files: list, params: dict):
+def load_csv(csv_files: list, params: dict = {}):
     """
     Read list of CSV files.
 
@@ -58,7 +58,7 @@ def load_csv(csv_files: list, params: dict):
 
 
 # Team 1
-def load_json(json_files: list, params: dict):
+def load_json(json_files: list, params: dict = {}):
     """
     Read list of JSON files.
 
@@ -96,7 +96,7 @@ def load_json(json_files: list, params: dict):
 
 
 # Team 1
-def load_xlsx(xlsx_files: list, params: dict):
+def load_xlsx(xlsx_files: list, params: dict = {}):
     """
     Read list of xlsx files.
 
@@ -138,7 +138,7 @@ def load_xlsx(xlsx_files: list, params: dict):
 
 
 # Team 1
-def load_xls(xls_files: list, params: dict):
+def load_xls(xls_files: list, params: dict = {}):
     """
     Read list of xls files.
 
@@ -180,7 +180,7 @@ def load_xls(xls_files: list, params: dict):
 
 
 # Team 3
-def load_gpx(gpx_files: list, params: dict):
+def load_gpx(gpx_files: list, params: dict = {}):
     pass
 
 
@@ -221,8 +221,6 @@ def load_tcx(tcx_files: List) -> Tuple[List,Dict]:
 
 
 # Team 4
-def load_jpg(jpg_files: list, params: dict):
+def load_jpg(jpg_files: list, params: dict = {}):
     pass
 
-a,b = load_tcx(["test.tcx"])
-print(a[0].df)
