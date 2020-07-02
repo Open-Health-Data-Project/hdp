@@ -1,7 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 from bs4 import NavigableString, Tag
-
+from typing import List,Tuple,Dict
 from hdp.struct.datatable import DataTable
 from pathlib import Path
 
@@ -185,7 +185,9 @@ def load_gpx(gpx_files: list, params: dict):
 
 
 # Team 3
-def load_tcx(tcx_files: list, params: dict):
+def load_tcx(tcx_files: List) -> Tuple[List,Dict]:
+    # def extract_trackpoints(activity):
+    #     for trackpoint in activity
     exceptions_dict = {}
     data_table_list = []
     data_table = DataTable()
@@ -208,7 +210,7 @@ def load_tcx(tcx_files: list, params: dict):
                                 point[value.name] = value.string
                             elif isinstance(value, Tag):
                                 point[value.name] = value.text.strip()
-                    activites.append(point)
+                activites.append(point)
             data_table.df = pd.DataFrame(activites)
         except Exception as e:
             exceptions_dict[name] = str(e)
@@ -221,3 +223,6 @@ def load_tcx(tcx_files: list, params: dict):
 # Team 4
 def load_jpg(jpg_files: list, params: dict):
     pass
+
+a,b = load_tcx(["test.tcx"])
+print(a[0].df)
