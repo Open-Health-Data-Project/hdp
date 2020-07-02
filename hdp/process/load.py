@@ -251,5 +251,3 @@ def load_tcx(tcx_files: List) -> Tuple[List, Dict]:
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
-
-
