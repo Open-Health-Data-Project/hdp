@@ -183,13 +183,13 @@ def load_xls(xls_files: list, params: dict = {}):
     return data_table_list, exceptions_dict
 
 
-def extract_tracks(gpx_parsed): # I have to end it
-    track_dict = dict()
+def extract_tracks(gpx_parsed):  # I have to end it
     track_list = list()
     if len(gpx_parsed.tracks) != 0:
         for track in gpx_parsed.tracks:
             for segment in track.segments:
                 for point in segment.points:
+                    track_dict = dict()
                     track_dict["type"] = "Trackpoint"
                     track_dict["longitude"] = point.longitude
                     track_dict["elevation"] = point.elevation
@@ -199,10 +199,10 @@ def extract_tracks(gpx_parsed): # I have to end it
     return track_list
 
 
-def extract_waypoint(gtx_parsed):
-    waypoint_dict = dict()
+def extract_waypoints(gtx_parsed):
     track_list = list()
     for waypoint in gtx_parsed.waypoints:
+        waypoint_dict = dict()
         waypoint_dict["type"] = "Waypoint"
         waypoint_dict["longitude"] = waypoint.longitude
         waypoint_dict["elevation"] = waypoint.elevation
@@ -212,40 +212,38 @@ def extract_waypoint(gtx_parsed):
 
 
 # Team 3
-def load_gpx(gpx_files: list, params: dict = {}) -> Tuple[List[DataTable], Dict]:
+def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
+    """
+    Read list of gpx files
+
+    Parameters
+    ------------
+    gpx_files: list of paths to .gpx files
+
+    Returns
+    -----------
+    List with DataTable objects and dictonary with exceptions
+    """
     exception_dict = {}
     data_table_list = []
-    data_table = DataTable()
     try:
         for path in gpx_files:
+            data_table = DataTable()
             name = _get_file_name(path)
             with (open(path, "r")) as file:
                 gpx_parsed = gpxpy.parse(file)
-                waypoints = extract_waypoint(gpx_parsed)
-                tracks = extract_tracks(gpx_parsed)
-                print(tracks)
-                print(waypoints)
-    #        for track in gpx_parsed.gpx_parsed:
-    #            for segment in track.segments:
-    #                for point in segment.points:
-    #                    print(point.longitude, point.latitude, point.elevation)
-    #        for waypoint in gpx_parsed.waypoints:
-    #            print(waypoint.longitude, waypoint.latitude, waypoint.elevation)
-            # for track in gpx_parsed.gpx_parsed:
-            #     for segment in track.segments:
-            #         print(segment.points)
-            # for element in gpx_parsed.waypoints:
-            #     print(len(gpx_parsed.waypoints))
-            #     print(element.latitude,element.longitude,element.elevation)
-            #     for segment in element:
-            #         print(segment.latitude,segment.longitude)
+            waypoints = extract_waypoints(gpx_parsed)
+            tracks = extract_tracks(gpx_parsed)
+            points = tracks + waypoints
+            data_table.df = pd.DataFrame(points)
+            data_table.name = name
+            data_table_list.append(data_table)
     except Exception as e:
         exception_dict[name] = str(e)
-
     else:
         data_table.name = name
         data_table_list.append(data_table)
-    print(exception_dict)
+    print(data_table_list[0].df)
     return data_table_list, exception_dict
 
 
