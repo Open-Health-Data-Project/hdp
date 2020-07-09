@@ -2,9 +2,10 @@ from pathlib import Path
 from typing import List, Tuple, Dict
 from bs4 import BeautifulSoup
 from bs4 import NavigableString, Tag
+import gpxpy
+from gpxpy import gpx
 
 import pandas as pd
-
 
 from hdp.struct.datatable import DataTable
 
@@ -182,9 +183,70 @@ def load_xls(xls_files: list, params: dict = {}):
     return data_table_list, exceptions_dict
 
 
+def extract_tracks(gpx_parsed): # I have to end it
+    track_dict = dict()
+    track_list = list()
+    if len(gpx_parsed.tracks) != 0:
+        for track in gpx_parsed.tracks:
+            for segment in track.segments:
+                for point in segment.points:
+                    track_dict["type"] = "Trackpoint"
+                    track_dict["longitude"] = point.longitude
+                    track_dict["elevation"] = point.elevation
+                    track_dict["latitude"] = point.latitude
+                    track_dict["time"] = point.time
+                    track_list.append(track_dict)
+    return track_list
+
+
+def extract_waypoint(gtx_parsed):
+    waypoint_dict = dict()
+    track_list = list()
+    for waypoint in gtx_parsed.waypoints:
+        waypoint_dict["type"] = "Waypoint"
+        waypoint_dict["longitude"] = waypoint.longitude
+        waypoint_dict["elevation"] = waypoint.elevation
+        waypoint_dict["latitude"] = waypoint.latitude
+        track_list.append(waypoint_dict)
+    return track_list
+
+
 # Team 3
-def load_gpx(gpx_files: list, params: dict = {}):
-    pass
+def load_gpx(gpx_files: list, params: dict = {}) -> Tuple[List[DataTable], Dict]:
+    exception_dict = {}
+    data_table_list = []
+    data_table = DataTable()
+    try:
+        for path in gpx_files:
+            name = _get_file_name(path)
+            with (open(path, "r")) as file:
+                gpx_parsed = gpxpy.parse(file)
+                waypoints = extract_waypoint(gpx_parsed)
+                tracks = extract_tracks(gpx_parsed)
+                print(tracks)
+                print(waypoints)
+    #        for track in gpx_parsed.gpx_parsed:
+    #            for segment in track.segments:
+    #                for point in segment.points:
+    #                    print(point.longitude, point.latitude, point.elevation)
+    #        for waypoint in gpx_parsed.waypoints:
+    #            print(waypoint.longitude, waypoint.latitude, waypoint.elevation)
+            # for track in gpx_parsed.gpx_parsed:
+            #     for segment in track.segments:
+            #         print(segment.points)
+            # for element in gpx_parsed.waypoints:
+            #     print(len(gpx_parsed.waypoints))
+            #     print(element.latitude,element.longitude,element.elevation)
+            #     for segment in element:
+            #         print(segment.latitude,segment.longitude)
+    except Exception as e:
+        exception_dict[name] = str(e)
+
+    else:
+        data_table.name = name
+        data_table_list.append(data_table)
+    print(exception_dict)
+    return data_table_list, exception_dict
 
 
 def extract_one_field_data(trackpoint) -> Dict:
@@ -221,6 +283,7 @@ def load_tcx(tcx_files: List) -> Tuple[List, Dict]:
     DataTable list:
         List of parsed DataTable objects with file name and DataFrame attributes filled.
 
+pass
     Exceptions dictionary:
         Dictionary with files names as keys and exceptions strings as values.
         Contains only files where an exception occurred.
@@ -237,7 +300,7 @@ def load_tcx(tcx_files: List) -> Tuple[List, Dict]:
             for trackpoint in activity.find_all("trackpoint"):
                 point = extract_one_field_data(trackpoint)
                 nested_data = extract_nested_values(trackpoint)
-                point = {**point,**nested_data}
+                point = {**point, **nested_data}
                 activites.append(point)
             data_table.df = pd.DataFrame(activites)
         except Exception as e:
@@ -251,3 +314,6 @@ def load_tcx(tcx_files: List) -> Tuple[List, Dict]:
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
+
+
+load_gpx(["home-work.gpx", "sample.gpx"])
