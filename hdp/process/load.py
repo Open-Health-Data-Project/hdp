@@ -194,7 +194,7 @@ def extract_tracks(gpx_parsed):  # I have to end it
                     track_dict["longitude"] = point.longitude
                     track_dict["elevation"] = point.elevation
                     track_dict["latitude"] = point.latitude
-                    track_dict["time"] = point.time
+                    track_dict["time"] = point.time if not "None" else None
                     track_list.append(track_dict)
     return track_list
 
@@ -222,7 +222,8 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
 
     Returns
     -----------
-    List with DataTable objects and dictonary with exceptions
+    List with DataTable objects and dictonary with exceptions whose occurred
+    during read
     """
     exception_dict = {}
     data_table_list = []
@@ -237,19 +238,18 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
             points = tracks + waypoints
             data_table.df = pd.DataFrame(points)
             data_table.name = name
+            data_table.df.dropna(axis=1, how="all", inplace=True)
             data_table_list.append(data_table)
     except Exception as e:
         exception_dict[name] = str(e)
     else:
         data_table.name = name
         data_table_list.append(data_table)
-    print(data_table_list[0].df)
     return data_table_list, exception_dict
 
 
 def extract_one_field_data(trackpoint) -> Dict:
     """
-
     :param trackpoint:
     :return: Not nested point values
     """
@@ -314,4 +314,3 @@ def load_jpg(jpg_files: list, params: dict = {}):
     pass
 
 
-load_gpx(["home-work.gpx", "sample.gpx"])
