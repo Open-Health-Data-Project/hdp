@@ -1,6 +1,6 @@
 import pandas as pd
 import re
-
+from scimath.units.api import UnitScalar
 default_units = {'speed': 'km/h',
                  'distance': 'km',
                  'weight': 'kg',
@@ -10,7 +10,7 @@ units_conversions = {}
 
 
 # Team 2
-def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
+def convert_time(time: str, time_format: str = None, mode: str = 'flag') -> pd.Timedelta or str:
     """
         Converts string with time into pd.Timedelta object
 
@@ -59,8 +59,9 @@ def convert_time(time: str, time_format: str = None, mode: str = 'flag'):
 
 
 # Team 2
-def convert_date(date: str, date_format: str = None, mode: str = 'flag'):
+def convert_date(date: str, date_format: str = None, mode: str = 'flag') -> pd.Timestamp or str:
     """
+    Converts string with date into pd.Timestamp object
 
     Parameters
     ----------
@@ -100,8 +101,27 @@ def convert_date(date: str, date_format: str = None, mode: str = 'flag'):
 
 
 # Team 2
-def convert_units(datatables: list):
-    pass
+def convert_units(unit: str) -> float or str:
+    """
+    Convert units using UnitScalar object
+    Parameters
+    ----------
+    unit : str representing value and units
+
+    Returns
+    -------
+    float if operation was successful, else returns input parameter
+    """
+    pattern = r'''(?P<value>[\d]{1,}([.'"][\d]+)?)([ \t'"]*)(?P<unit>[^\s\d]+)([ \t'"]*)'''
+    try:
+        units_dict = re.search(pattern, unit).groupdict()
+        scalar_unit = UnitScalar(units_dict['value'], units=units_dict['unit'])
+        if scalar_unit.units.value == 1:
+            return unit
+        else:
+            return float(scalar_unit) * scalar_unit.units.value
+    except (AttributeError, TypeError):
+        return unit
 
 
 # Team 2
