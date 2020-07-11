@@ -183,18 +183,14 @@ def load_xls(xls_files: list, params: dict = {}):
     return data_table_list, exceptions_dict
 
 
-def extract_tracks(gpx_parsed):  # I have to end it
+def extract_tracks(gpx_parsed):
     track_list = list()
     if len(gpx_parsed.tracks) != 0:
         for track in gpx_parsed.tracks:
             for segment in track.segments:
                 for point in segment.points:
-                    track_dict = dict()
-                    track_dict["type"] = "Trackpoint"
-                    track_dict["longitude"] = point.longitude
-                    track_dict["elevation"] = point.elevation
-                    track_dict["latitude"] = point.latitude
-                    track_dict["time"] = point.time if not "None" else None
+                    track_dict = {"type": "Trackpoint", "longitude": point.longitude, "elevation": point.elevation,
+                                  "latitude": point.latitude, "time": point.time if not "None" else None}
                     track_list.append(track_dict)
     return track_list
 
@@ -202,7 +198,7 @@ def extract_tracks(gpx_parsed):  # I have to end it
 def extract_waypoints(gpx_parsed):
     track_list = list()
     for waypoint in gpx_parsed.waypoints:
-        waypoint_dict = dict()
+        waypoint_dict = {}
         waypoint_dict["type"] = "Waypoint"
         waypoint_dict["longitude"] = waypoint.longitude
         waypoint_dict["elevation"] = waypoint.elevation
@@ -312,3 +308,4 @@ pass
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
+
