@@ -199,9 +199,9 @@ def extract_tracks(gpx_parsed):  # I have to end it
     return track_list
 
 
-def extract_waypoints(gtx_parsed):
+def extract_waypoints(gpx_parsed):
     track_list = list()
-    for waypoint in gtx_parsed.waypoints:
+    for waypoint in gpx_parsed.waypoints:
         waypoint_dict = dict()
         waypoint_dict["type"] = "Waypoint"
         waypoint_dict["longitude"] = waypoint.longitude
@@ -312,5 +312,3 @@ pass
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
-
-
