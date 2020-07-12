@@ -207,6 +207,28 @@ def extract_waypoints(gpx_parsed):
     return track_list
 
 
+def get_gpx_metadata(gpx_parsed, file_name):
+    """
+    Gets metadata from gpx_file
+
+    Parameters
+    -----------
+    gpx_parsed = .gpx file parsed using gpxpy.parse
+
+    Returns
+    -----------
+    Dictionary with metadata.
+    """
+    metadata = {}
+    gpx_parsed = gpxpy.parse("Test")
+    metadata["start_time"], metadata["stop_time"] = gpx_parsed.get_time_bounds()
+    metadata["duration"] = gpx_parsed.get_duration()
+    # gpx_parsed.get_moving_data()
+    # metadata["average_speed"] = gpx_parsed toDo need to get speed between points
+    metadata["length"] = gpx_parsed.length_2d()
+    metadata["uphill_elevation"], metadata["downhill_elevation"] = gpx_parsed.get_uphill_downhill()
+
+
 # Team 3
 def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
     """
