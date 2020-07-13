@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import List, Tuple, Dict
+
 from bs4 import BeautifulSoup
 from bs4 import NavigableString, Tag
-import gpxpy
-from gpxpy import gpx
-
-import pandas as pd
 
 from hdp.struct.datatable import DataTable
+
+import gpxpy
+import pandas as pd
 
 
 def _get_file_name(path):
@@ -219,14 +219,22 @@ def get_gpx_metadata(gpx_parsed, file_name):
     -----------
     Dictionary with metadata.
     """
+    # gpx_parsed = gpxpy.parse("")
     metadata = {}
-    gpx_parsed = gpxpy.parse("Test")
+    metadata["file_name"] = file_name
     metadata["start_time"], metadata["stop_time"] = gpx_parsed.get_time_bounds()
-    metadata["duration"] = gpx_parsed.get_duration()
-    # gpx_parsed.get_moving_data()
-    # metadata["average_speed"] = gpx_parsed toDo need to get speed between points
-    metadata["length"] = gpx_parsed.length_2d()
+    lenght = gpx_parsed.length_2d()
+    duration = pd.to_timedelta(gpx_parsed.get_duration(), unit="s")
+    metadata["duration"] = duration
+    moving = gpx_parsed.get_moving_data()
+    if lenght is not None and duration is not None and duration.total_seconds() != 0:
+        metadata["average_speed"] = lenght / duration.total_seconds()
+    else:
+        metadata["average_speed"] = None
+    metadata["min_elevation"], metadata["max_elevation"] = gpx_parsed.get_elevation_extremes()
+    metadata["length"] = lenght
     metadata["uphill_elevation"], metadata["downhill_elevation"] = gpx_parsed.get_uphill_downhill()
+    return metadata
 
 
 # Team 3
@@ -245,14 +253,18 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
     """
     exception_dict = {}
     data_table_list = []
+    metadata_pandas = DataTable()
+    data_table = DataTable()
+    metadata = []
     try:
         for path in gpx_files:
-            data_table = DataTable()
             name = _get_file_name(path)
             with (open(path, "r")) as file:
                 gpx_parsed = gpxpy.parse(file)
             waypoints = extract_waypoints(gpx_parsed)
             tracks = extract_tracks(gpx_parsed)
+            metadata.append(get_gpx_metadata(gpx_parsed, name))
+
             points = tracks + waypoints
             data_table.df = pd.DataFrame(points)
             data_table.name = name
@@ -263,7 +275,9 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
     else:
         data_table.name = name
         data_table_list.append(data_table)
-    return data_table_list, exception_dict
+    metadata_pandas = pd.DataFrame(metadata)
+    metadata_pandas.append(metadata, ignore_index=True)
+    return data_table_list, metadata_pandas.dropna(axis=0, how="all"), exception_dict
 
 
 def extract_one_field_data(trackpoint) -> Dict:
@@ -330,4 +344,3 @@ pass
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
-
