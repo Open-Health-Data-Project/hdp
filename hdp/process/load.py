@@ -248,8 +248,8 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
 
     Returns
     -----------
-    List with DataTable objects and dictonary with exceptions whose occurred
-    during read
+    List with DataTable objects,DataFrame whose contain metadata and dictonary with exceptions whose occurred
+    during read .gpx file
     """
     exception_dict = {}
     data_table_list = []
