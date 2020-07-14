@@ -344,6 +344,3 @@ pass
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
-
-
-
