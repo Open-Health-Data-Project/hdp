@@ -6,6 +6,7 @@ from bs4 import NavigableString, Tag
 
 from hdp.struct.datatable import DataTable
 
+
 import gpxpy
 import pandas as pd
 
@@ -238,7 +239,7 @@ def get_gpx_metadata(gpx_parsed, file_name):
 
 
 # Team 3
-def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
+def load_gpx(gpx_files: list) -> Tuple[List[DataTable], pd.DataFrame, Dict]:
     """
     Read list of gpx files
 
@@ -343,3 +344,6 @@ pass
 # Team 4
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
+
+
+
