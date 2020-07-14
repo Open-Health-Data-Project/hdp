@@ -344,4 +344,3 @@ pass
 def load_jpg(jpg_files: list, params: dict = {}):
     pass
 
-
