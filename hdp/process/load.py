@@ -6,6 +6,7 @@ from bs4 import NavigableString, Tag
 
 from hdp.struct.datatable import DataTable
 
+
 import gpxpy
 import pandas as pd
 
@@ -238,7 +239,7 @@ def get_gpx_metadata(gpx_parsed, file_name):
 
 
 # Team 3
-def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
+def load_gpx(gpx_files: list) -> Tuple[List[DataTable], pd.DataFrame, Dict]:
     """
     Read list of gpx files
 
@@ -256,25 +257,24 @@ def load_gpx(gpx_files: list) -> Tuple[List[DataTable], Dict]:
     metadata_pandas = DataTable()
     data_table = DataTable()
     metadata = []
-    try:
-        for path in gpx_files:
+    for path in gpx_files:
+        try:
             name = _get_file_name(path)
-            with (open(path, "r")) as file:
+            with open(path, "r") as file:
                 gpx_parsed = gpxpy.parse(file)
             waypoints = extract_waypoints(gpx_parsed)
             tracks = extract_tracks(gpx_parsed)
             metadata.append(get_gpx_metadata(gpx_parsed, name))
-
             points = tracks + waypoints
             data_table.df = pd.DataFrame(points)
             data_table.name = name
             data_table.df.dropna(axis=1, how="all", inplace=True)
             data_table_list.append(data_table)
-    except Exception as e:
-        exception_dict[name] = str(e)
-    else:
-        data_table.name = name
-        data_table_list.append(data_table)
+        except Exception as e:
+            exception_dict[name] = str(e)
+        else:
+            data_table.name = name
+            data_table_list.append(data_table)
     metadata_pandas = pd.DataFrame(metadata)
     metadata_pandas.append(metadata, ignore_index=True)
     return data_table_list, metadata_pandas.dropna(axis=0, how="all"), exception_dict
